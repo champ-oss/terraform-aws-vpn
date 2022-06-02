@@ -26,22 +26,12 @@ module "acm" {
   enable_validation = true
 }
 
-resource "aws_iam_saml_provider" "provider" {
-  name                   = local.git
-  saml_metadata_document = file("saml-example.xml")
-}
-
-resource "aws_iam_saml_provider" "self_service" {
-  name                   = "${local.git}-self-service"
-  saml_metadata_document = file("saml-example.xml")
-}
-
 module "this" {
-  source                         = "../../"
-  git                            = local.git
-  server_certificate_arn         = module.acm.arn
-  saml_provider_arn              = aws_iam_saml_provider.provider.arn
-  self_service_saml_provider_arn = aws_iam_saml_provider.self_service.arn
-  subnet_id                      = module.vpc.private_subnets_ids[0]
-  vpc_id                         = module.vpc.vpc_id
+  source                 = "../../"
+  git                    = local.git
+  server_certificate_arn = module.acm.arn
+  authentication_type    = "directory-service-authentication"
+  active_directory_id    = "abc123"
+  subnet_id              = module.vpc.private_subnets_ids[0]
+  vpc_id                 = module.vpc.vpc_id
 }

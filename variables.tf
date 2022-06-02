@@ -3,18 +3,8 @@ variable "git" {
   type        = string
 }
 
-variable "saml_provider_arn" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn"
-  type        = string
-}
-
 variable "server_certificate_arn" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#server_certificate_arn"
-  type        = string
-}
-
-variable "self_service_saml_provider_arn" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn"
   type        = string
 }
 
@@ -26,6 +16,36 @@ variable "subnet_id" {
 variable "vpc_id" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group#vpc_id"
   type        = string
+}
+
+variable "authentication_type" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#type"
+  type        = string
+  default     = "federated-authentication"
+}
+
+variable "active_directory_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#active_directory_id"
+  type        = string
+  default     = null
+}
+
+variable "root_certificate_chain_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#root_certificate_chain_arn"
+  type        = string
+  default     = null
+}
+
+variable "saml_provider_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn"
+  type        = string
+  default     = null
+}
+
+variable "self_service_saml_provider_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn"
+  type        = string
+  default     = null
 }
 
 variable "transport_protocol" {

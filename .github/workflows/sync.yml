@@ -20,6 +20,7 @@ jobs:
             LICENSE
             .tflint.hcl
             .github/CODEOWNERS
+            .github/dependabot.yml
             .github/workflows/lint.yml
             .github/workflows/module.yml
             .github/workflows/release.yml

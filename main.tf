@@ -8,7 +8,9 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   self_service_portal    = "enabled"
 
   authentication_options {
-    type                           = "federated-authentication"
+    type                           = var.authentication_type
+    active_directory_id            = var.active_directory_id
+    root_certificate_chain_arn     = var.root_certificate_chain_arn
     saml_provider_arn              = var.saml_provider_arn
     self_service_saml_provider_arn = var.self_service_saml_provider_arn
   }
