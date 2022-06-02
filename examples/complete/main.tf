@@ -27,11 +27,11 @@ module "acm" {
 }
 
 module "this" {
-  source                 = "../../"
-  git                    = local.git
-  server_certificate_arn = module.acm.arn
-  authentication_type    = "directory-service-authentication"
-  active_directory_id    = "abc123"
-  subnet_id              = module.vpc.private_subnets_ids[0]
-  vpc_id                 = module.vpc.vpc_id
+  source                     = "../../"
+  git                        = local.git
+  server_certificate_arn     = module.acm.arn
+  authentication_type        = "certificate-authentication"
+  root_certificate_chain_arn = module.acm.arn
+  subnet_id                  = module.vpc.private_subnets_ids[0]
+  vpc_id                     = module.vpc.vpc_id
 }
