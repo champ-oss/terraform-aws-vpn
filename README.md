@@ -16,6 +16,9 @@ A Terraform module for deploying an AWS Client VPN Endpoint
 
 See the `examples/` folder
 
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+
 ## Features
 
 
