@@ -11,14 +11,14 @@ data "aws_route53_zone" "this" {
 }
 
 module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.48-5b9b752"
+  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.49-a63798e"
   name                     = local.git
   availability_zones_count = 2
   retention_in_days        = 1
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.110-61ad6b7"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.111-28fcc7c"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
