@@ -6,6 +6,8 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   transport_protocol     = var.transport_protocol
   dns_servers            = var.dns_servers
   self_service_portal    = "enabled"
+  security_group_ids     = concat(var.security_groups, [aws_security_group.vpn.id])
+  vpc_id                 = var.vpc_id
 
   authentication_options {
     type                           = var.authentication_type
@@ -37,5 +39,4 @@ resource "aws_ec2_client_vpn_route" "this" {
 resource "aws_ec2_client_vpn_network_association" "this" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   subnet_id              = var.subnet_id
-  security_groups        = concat(var.security_groups, [aws_security_group.vpn.id])
 }
