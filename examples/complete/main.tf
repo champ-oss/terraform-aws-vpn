@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-west-1"
-}
-
 locals {
   git = "terraform-aws-vpn"
 }
@@ -10,11 +6,22 @@ data "aws_route53_zone" "this" {
   name = "oss.champtest.net."
 }
 
-module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.49-a63798e"
-  name                     = local.git
-  availability_zones_count = 2
-  retention_in_days        = 1
+data "aws_vpcs" "this" {
+  tags = {
+    purpose = "vega"
+  }
+}
+
+data "aws_subnets" "this" {
+  tags = {
+    purpose = "vega"
+    Type    = "Private"
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpcs.this.ids[0]]
+  }
 }
 
 module "acm" {
@@ -32,6 +39,6 @@ module "this" {
   server_certificate_arn     = module.acm.arn
   authentication_type        = "certificate-authentication"
   root_certificate_chain_arn = module.acm.arn
-  subnet_id                  = module.vpc.private_subnets_ids[0]
-  vpc_id                     = module.vpc.vpc_id
+  subnet_id                  = data.aws_subnets.this.ids[0]
+  vpc_id                     = data.aws_vpcs.this.ids[0]
 }
