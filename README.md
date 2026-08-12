@@ -41,6 +41,8 @@ No modules.
 | [aws_ec2_client_vpn_endpoint.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint) | resource |
 | [aws_ec2_client_vpn_network_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association) | resource |
 | [aws_ec2_client_vpn_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_route) | resource |
+| [aws_iam_saml_provider.self_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider) | resource |
+| [aws_iam_saml_provider.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider) | resource |
 | [aws_security_group.vpn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 
 ## Inputs
@@ -54,9 +56,13 @@ No modules.
 | <a name="input_git"></a> [git](#input\_git) | Name of the Git repo | `string` | n/a | yes |
 | <a name="input_retention_in_days"></a> [retention\_in\_days](#input\_retention\_in\_days) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group#retention_in_days | `number` | `731` | no |
 | <a name="input_root_certificate_chain_arn"></a> [root\_certificate\_chain\_arn](#input\_root\_certificate\_chain\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#root_certificate_chain_arn | `string` | `null` | no |
+| <a name="input_saml_metadata_document"></a> [saml\_metadata\_document](#input\_saml\_metadata\_document) | SAML metadata document (XML) for the IAM SAML provider used for authentication, e.g. downloaded from IAM Identity Center after rotating its signing certificate. When set, this module creates and manages the aws\_iam\_saml\_provider resource instead of requiring var.saml\_provider\_arn to already exist. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider#saml_metadata_document | `string` | `null` | no |
 | <a name="input_saml_provider_arn"></a> [saml\_provider\_arn](#input\_saml\_provider\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn | `string` | `null` | no |
+| <a name="input_saml_provider_name"></a> [saml\_provider\_name](#input\_saml\_provider\_name) | Name of the IAM SAML provider used for authentication, created when var.saml\_metadata\_document is set. Defaults to "<var.git>-vpn". The name is immutable in AWS (changing it forces a new provider with a new ARN), so if you are importing a pre-existing aws\_iam\_saml\_provider under this module's management, set this to that provider's exact current name first to avoid an unwanted replacement. | `string` | `null` | no |
 | <a name="input_security_groups"></a> [security\_groups](#input\_security\_groups) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association#security_groups | `list(string)` | `[]` | no |
+| <a name="input_self_service_saml_metadata_document"></a> [self\_service\_saml\_metadata\_document](#input\_self\_service\_saml\_metadata\_document) | SAML metadata document (XML) for the IAM SAML provider used for the self-service portal, e.g. downloaded from IAM Identity Center after rotating its signing certificate. When set, this module creates and manages the aws\_iam\_saml\_provider resource instead of requiring var.self\_service\_saml\_provider\_arn to already exist. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider#saml_metadata_document | `string` | `null` | no |
 | <a name="input_self_service_saml_provider_arn"></a> [self\_service\_saml\_provider\_arn](#input\_self\_service\_saml\_provider\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#saml_provider_arn | `string` | `null` | no |
+| <a name="input_self_service_saml_provider_name"></a> [self\_service\_saml\_provider\_name](#input\_self\_service\_saml\_provider\_name) | Name of the IAM SAML provider used for the self-service portal, created when var.self\_service\_saml\_metadata\_document is set. Defaults to "<var.git>-vpn-self-service". The name is immutable in AWS (changing it forces a new provider with a new ARN), so if you are importing a pre-existing aws\_iam\_saml\_provider under this module's management, set this to that provider's exact current name first to avoid an unwanted replacement. | `string` | `null` | no |
 | <a name="input_server_certificate_arn"></a> [server\_certificate\_arn](#input\_server\_certificate\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#server_certificate_arn | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association#subnet_id | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to assign to resources | `map(string)` | `{}` | no |
@@ -65,13 +71,113 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_client_vpn_endpoint_dns_name"></a> [client\_vpn\_endpoint\_dns\_name](#output\_client\_vpn\_endpoint\_dns\_name) | DNS name of the Client VPN endpoint |
+| <a name="output_client_vpn_endpoint_id"></a> [client\_vpn\_endpoint\_id](#output\_client\_vpn\_endpoint\_id) | ID of the Client VPN endpoint |
+| <a name="output_saml_provider_arn"></a> [saml\_provider\_arn](#output\_saml\_provider\_arn) | ARN of the IAM SAML provider used for authentication, either created by this module from var.saml\_metadata\_document or passed in via var.saml\_provider\_arn |
+| <a name="output_self_service_saml_provider_arn"></a> [self\_service\_saml\_provider\_arn](#output\_self\_service\_saml\_provider\_arn) | ARN of the IAM SAML provider used for the self-service portal, either created by this module from var.self\_service\_saml\_metadata\_document or passed in via var.self\_service\_saml\_provider\_arn |
 <!-- END_TF_DOCS -->
 
 ## Features
 
+### Rotating an IAM Identity Center SAML signing certificate
 
+If `authentication_type = "federated-authentication"` and IAM Identity Center is the SAML source,
+IAM Identity Center's signing certificate periodically needs to be rotated before it expires.
+`aws_iam_saml_provider.this` and `.self_service` are two independent resources — a given rotation
+only touches whichever one(s) actually had their certificate rotated; there's no need to update
+both together unless both did.
 
+SAML IdP metadata isn't secret (it's just the entity ID, SSO endpoint, and public signing
+certificate), so it's fine to save the downloaded XML as a file next to your root config and
+commit it — this also makes each rotation a plain file diff instead of an HCL edit:
+
+```hcl
+saml_metadata_document              = file("vpn-saml-metadata.xml")
+self_service_saml_metadata_document = file("vpn-saml-metadata-self-service.xml")
+```
+
+If the provider(s) are already managed by this module (created via `saml_metadata_document` /
+`self_service_saml_metadata_document`, not just referenced by ARN), rotate as follows:
+
+1. In the IAM Identity Center console, rotate/refresh the signing certificate for whichever custom
+   SAML application(s) backing this Client VPN endpoint need it (the regular application and/or,
+   if used, the self-service one), then download the updated IdP SAML metadata XML for each.
+2. Overwrite the corresponding local file (e.g. `vpn-saml-metadata.xml` and/or
+   `vpn-saml-metadata-self-service.xml`) with the newly downloaded XML — same filename, so no HCL
+   changes are needed if you're using `file()` as shown above.
+3. Run `terraform plan` and confirm the diff shows **only** an in-place update to
+   `saml_metadata_document` (and/or `self_service_saml_metadata_document`) on the affected
+   `aws_iam_saml_provider` resource — no change to `name`, no replacement (`-/+`), no change to the
+   ARN, and no forced change on `aws_ec2_client_vpn_endpoint`. If you see a replacement instead of
+   an update, stop — that means the resource isn't the one already in state, or
+   `var.saml_provider_name` / `var.self_service_saml_provider_name` doesn't match the real name.
+4. Run `terraform apply`.
+5. Verify: `aws iam get-saml-provider --saml-provider-arn <arn>` shows the new certificate and
+   expiration date, then do a real VPN client connection through the rotated app to confirm SAML
+   auth still succeeds end-to-end.
+6. Commit the updated XML file(s) to git.
+
+No `import` block is needed for a routine rotation — that's only for the one-time onboarding of a
+provider that isn't in Terraform state yet (see below).
+
+If you instead manage the `aws_iam_saml_provider` resource(s) outside of this module, keep passing
+their ARNs via `var.saml_provider_arn` / `var.self_service_saml_provider_arn` and update that
+resource's `saml_metadata_document` with the new XML wherever it's defined — this module only
+consumes the ARN in that mode.
+
+### Importing a pre-existing IAM SAML provider under this module
+
+`aws_iam_saml_provider.name` is immutable in AWS — it cannot be changed in place, only replaced
+(which issues a **new ARN** and breaks anything that trusts the old one, e.g. IAM role trust
+policies or an in-use Client VPN endpoint). By default this module names the providers it creates
+`"${var.git}-vpn"` and `"${var.git}-vpn-self-service"`.
+
+If you want to bring an existing, externally-created `aws_iam_saml_provider` under this module's
+management instead of letting the module create a new one, use an
+[`import` block](https://developer.hashicorp.com/terraform/language/import) rather than the
+`terraform import` CLI command, so you can preview the plan before anything changes. The examples
+below assume the module is called `this` in your root config (`module "this" { source = ... }`,
+matching `examples/complete`) — adjust the `to` address to match your own module call name.
+
+1. Find the ARN of the existing provider(s), e.g. via the AWS console (IAM → Identity providers)
+   or `aws iam list-saml-providers`. It looks like
+   `arn:aws:iam::<account_id>:saml-provider/<name>` — the `<name>` segment after `saml-provider/`
+   is the provider's immutable name.
+2. Set `var.saml_provider_name` / `var.self_service_saml_provider_name` to that exact `<name>`.
+   This is required — without it, the module's default computed name won't match the imported
+   resource and the next `apply` will destroy and recreate the provider under a new ARN.
+3. Set `var.saml_metadata_document` / `var.self_service_saml_metadata_document` to a metadata
+   document XML — see the two options below depending on whether you're rotating the certificate
+   as part of this same import.
+4. Add an `import` block per provider you're importing, in any `.tf` file in your root module:
+
+   ```hcl
+   import {
+     to = module.this.aws_iam_saml_provider.this
+     id = "arn:aws:iam::123456789012:saml-provider/<existing-name>"
+   }
+
+   import {
+     to = module.this.aws_iam_saml_provider.self_service
+     id = "arn:aws:iam::123456789012:saml-provider/<existing-self-service-name>"
+   }
+   ```
+
+   Only include the block(s) for the provider(s) you're actually importing.
+5. Run `terraform plan` and check the plan for the imported resource(s) before applying:
+   - **Importing as-is (no cert rotation):** use the provider's *current* metadata document XML
+     for step 3. The plan should show the resource being imported with no changes. If it shows a
+     replacement, `var.saml_provider_name` doesn't exactly match the real name — fix that first.
+   - **Importing and rotating the certificate in the same apply:** use the *new*, rotated metadata
+     document XML for step 3 instead (see the certificate rotation steps above for how to get it).
+     The plan should show the resource being imported with an in-place update to
+     `saml_metadata_document` only — never a replacement, since `name` is unchanged and only
+     `name` forces recreation.
+6. Run `terraform apply` to complete the import. Afterward, delete the `import` block(s) — they've
+   done their job and Terraform will otherwise re-evaluate them (harmlessly, as a no-op) on every
+   future plan.
 
 ## Contributing
 

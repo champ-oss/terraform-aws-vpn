@@ -48,6 +48,30 @@ variable "self_service_saml_provider_arn" {
   default     = null
 }
 
+variable "saml_metadata_document" {
+  description = "SAML metadata document (XML) for the IAM SAML provider used for authentication, e.g. downloaded from IAM Identity Center after rotating its signing certificate. When set, this module creates and manages the aws_iam_saml_provider resource instead of requiring var.saml_provider_arn to already exist. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider#saml_metadata_document"
+  type        = string
+  default     = null
+}
+
+variable "self_service_saml_metadata_document" {
+  description = "SAML metadata document (XML) for the IAM SAML provider used for the self-service portal, e.g. downloaded from IAM Identity Center after rotating its signing certificate. When set, this module creates and manages the aws_iam_saml_provider resource instead of requiring var.self_service_saml_provider_arn to already exist. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider#saml_metadata_document"
+  type        = string
+  default     = null
+}
+
+variable "saml_provider_name" {
+  description = "Name of the IAM SAML provider used for authentication, created when var.saml_metadata_document is set. Defaults to \"<var.git>-vpn\". The name is immutable in AWS (changing it forces a new provider with a new ARN), so if you are importing a pre-existing aws_iam_saml_provider under this module's management, set this to that provider's exact current name first to avoid an unwanted replacement."
+  type        = string
+  default     = null
+}
+
+variable "self_service_saml_provider_name" {
+  description = "Name of the IAM SAML provider used for the self-service portal, created when var.self_service_saml_metadata_document is set. Defaults to \"<var.git>-vpn-self-service\". The name is immutable in AWS (changing it forces a new provider with a new ARN), so if you are importing a pre-existing aws_iam_saml_provider under this module's management, set this to that provider's exact current name first to avoid an unwanted replacement."
+  type        = string
+  default     = null
+}
+
 variable "transport_protocol" {
   description = "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-clientvpnendpoint.html#cfn-ec2-clientvpnendpoint-transportprotocol"
   type        = string
@@ -94,4 +118,10 @@ locals {
     creator   = "terraform"
     component = "vpn"
   }
+
+  # Prefer the SAML provider created by this module (when a metadata document is supplied) and fall
+  # back to a pre-existing provider ARN otherwise. This is what lets a rotated IAM Identity Center
+  # signing certificate be applied by just updating var.saml_metadata_document.
+  saml_provider_arn              = var.saml_metadata_document != null ? aws_iam_saml_provider.this[0].arn : var.saml_provider_arn
+  self_service_saml_provider_arn = var.self_service_saml_metadata_document != null ? aws_iam_saml_provider.self_service[0].arn : var.self_service_saml_provider_arn
 }
