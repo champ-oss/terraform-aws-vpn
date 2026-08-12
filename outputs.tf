@@ -9,7 +9,7 @@ output "client_vpn_endpoint_dns_name" {
 }
 
 output "saml_provider_arn" {
-  description = "ARN of the IAM SAML provider used for authentication, either created by this module from var.saml_metadata_document or passed in via var.saml_provider_arn"
+  description = "ARN of the IAM SAML provider used for auth, either created by this module from var.saml_metadata_document or passed in via var.saml_provider_arn"
   value       = local.saml_provider_arn
 }
 
