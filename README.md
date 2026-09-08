@@ -36,10 +36,15 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_cloudwatch_log_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_stream.tcp_fallback](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_stream) | resource |
 | [aws_cloudwatch_log_stream.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_stream) | resource |
+| [aws_ec2_client_vpn_authorization_rule.tcp_fallback](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_authorization_rule) | resource |
 | [aws_ec2_client_vpn_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_authorization_rule) | resource |
+| [aws_ec2_client_vpn_endpoint.tcp_fallback](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint) | resource |
 | [aws_ec2_client_vpn_endpoint.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint) | resource |
+| [aws_ec2_client_vpn_network_association.tcp_fallback](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association) | resource |
 | [aws_ec2_client_vpn_network_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association) | resource |
+| [aws_ec2_client_vpn_route.tcp_fallback](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_route) | resource |
 | [aws_ec2_client_vpn_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_route) | resource |
 | [aws_iam_saml_provider.self_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider) | resource |
 | [aws_iam_saml_provider.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_saml_provider) | resource |
@@ -53,6 +58,7 @@ No modules.
 | <a name="input_authentication_type"></a> [authentication\_type](#input\_authentication\_type) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#type | `string` | `"federated-authentication"` | no |
 | <a name="input_client_cidr_block"></a> [client\_cidr\_block](#input\_client\_cidr\_block) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#client_cidr_block | `string` | `"10.255.0.0/16"` | no |
 | <a name="input_dns_servers"></a> [dns\_servers](#input\_dns\_servers) | https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-clientvpnendpoint.html#cfn-ec2-clientvpnendpoint-transportprotocol | `list(string)` | <pre>[<br>  "8.8.8.8",<br>  "8.8.4.4"<br>]</pre> | no |
+| <a name="input_enable_tcp_fallback"></a> [enable\_tcp\_fallback](#input\_enable\_tcp\_fallback) | Create a second, TCP-only Client VPN endpoint alongside the primary one, for clients on networks that block UDP. A Client VPN endpoint only supports one transport protocol, so this requires var.transport\_protocol to be "udp". The fallback endpoint shares the server certificate, SAML providers, security group, subnet association and log group with the primary endpoint. | `bool` | `false` | no |
 | <a name="input_git"></a> [git](#input\_git) | Name of the Git repo | `string` | n/a | yes |
 | <a name="input_retention_in_days"></a> [retention\_in\_days](#input\_retention\_in\_days) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group#retention_in_days | `number` | `731` | no |
 | <a name="input_root_certificate_chain_arn"></a> [root\_certificate\_chain\_arn](#input\_root\_certificate\_chain\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#root_certificate_chain_arn | `string` | `null` | no |
@@ -66,6 +72,7 @@ No modules.
 | <a name="input_server_certificate_arn"></a> [server\_certificate\_arn](#input\_server\_certificate\_arn) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#server_certificate_arn | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_network_association#subnet_id | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to assign to resources | `map(string)` | `{}` | no |
+| <a name="input_tcp_fallback_client_cidr_block"></a> [tcp\_fallback\_client\_cidr\_block](#input\_tcp\_fallback\_client\_cidr\_block) | Client CIDR block for the TCP fallback endpoint created by var.enable\_tcp\_fallback. Must not overlap with var.client\_cidr\_block or the VPC CIDR. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#client_cidr_block | `string` | `"10.254.0.0/16"` | no |
 | <a name="input_transport_protocol"></a> [transport\_protocol](#input\_transport\_protocol) | https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-clientvpnendpoint.html#cfn-ec2-clientvpnendpoint-transportprotocol | `string` | `"tcp"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group#vpc_id | `string` | n/a | yes |
 
@@ -77,9 +84,32 @@ No modules.
 | <a name="output_client_vpn_endpoint_id"></a> [client\_vpn\_endpoint\_id](#output\_client\_vpn\_endpoint\_id) | ID of the Client VPN endpoint |
 | <a name="output_saml_provider_arn"></a> [saml\_provider\_arn](#output\_saml\_provider\_arn) | ARN of the IAM SAML provider used for authentication, either created by this module from var.saml\_metadata\_document or passed in via var.saml\_provider\_arn |
 | <a name="output_self_service_saml_provider_arn"></a> [self\_service\_saml\_provider\_arn](#output\_self\_service\_saml\_provider\_arn) | ARN of the IAM SAML provider used for the self-service portal, either created by this module from var.self\_service\_saml\_metadata\_document or passed in via var.self\_service\_saml\_provider\_arn |
+| <a name="output_tcp_fallback_client_vpn_endpoint_dns_name"></a> [tcp\_fallback\_client\_vpn\_endpoint\_dns\_name](#output\_tcp\_fallback\_client\_vpn\_endpoint\_dns\_name) | DNS name of the TCP fallback Client VPN endpoint, or null when var.enable\_tcp\_fallback is false |
+| <a name="output_tcp_fallback_client_vpn_endpoint_id"></a> [tcp\_fallback\_client\_vpn\_endpoint\_id](#output\_tcp\_fallback\_client\_vpn\_endpoint\_id) | ID of the TCP fallback Client VPN endpoint, or null when var.enable\_tcp\_fallback is false |
 <!-- END_TF_DOCS -->
 
 ## Features
+
+### TCP fallback
+
+UDP is the better default for a Client VPN endpoint (lower latency, no TCP-over-TCP meltdown), but
+some corporate and public Wi-Fi networks block UDP/1194 outright. A Client VPN endpoint supports
+exactly one transport protocol, so covering both means running two endpoints:
+
+```hcl
+transport_protocol  = "udp"
+enable_tcp_fallback = true
+```
+
+That creates a second TCP endpoint sharing the primary's server certificate, SAML providers,
+security group, subnet association and CloudWatch log group (under its own `vpn-tcp-fallback` log
+stream), so clients get the same access and authentication either way. The two endpoints need
+non-overlapping client address pools — see `var.tcp_fallback_client_cidr_block`.
+
+Distribute both `.ovpn` profiles to users (the fallback endpoint's own self-service portal is
+enabled too) and have them connect with the TCP one only when UDP fails. Because these are separate
+endpoints, each associated subnet is billed per endpoint, and a connected user is billed on
+whichever endpoint they are actually using.
 
 ### Rotating an IAM Identity Center SAML signing certificate
 
