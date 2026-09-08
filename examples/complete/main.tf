@@ -59,4 +59,14 @@ module "this" {
   root_certificate_chain_arn = module.acm.arn
   subnet_id                  = data.aws_subnets.this.ids[0]
   vpc_id                     = data.aws_vpcs.this.ids[0]
+  transport_protocol         = "udp"
+  enable_tcp_fallback        = true
+}
+
+output "client_vpn_endpoint_id" {
+  value = module.this.client_vpn_endpoint_id
+}
+
+output "tcp_fallback_client_vpn_endpoint_id" {
+  value = module.this.tcp_fallback_client_vpn_endpoint_id
 }

@@ -78,6 +78,18 @@ variable "transport_protocol" {
   default     = "tcp"
 }
 
+variable "enable_tcp_fallback" {
+  description = "Create a second, TCP-only Client VPN endpoint alongside the primary one, for clients on networks that block UDP. A Client VPN endpoint only supports one transport protocol, so this requires var.transport_protocol to be \"udp\". The fallback endpoint shares the server certificate, SAML providers, security group, subnet association and log group with the primary endpoint."
+  type        = bool
+  default     = false
+}
+
+variable "tcp_fallback_client_cidr_block" {
+  description = "Client CIDR block for the TCP fallback endpoint created by var.enable_tcp_fallback. Must not overlap with var.client_cidr_block or the VPC CIDR. https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_client_vpn_endpoint#client_cidr_block"
+  type        = string
+  default     = "10.254.0.0/16"
+}
+
 variable "tags" {
   description = "Map of tags to assign to resources"
   type        = map(string)
